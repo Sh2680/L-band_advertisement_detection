@@ -25,7 +25,7 @@ A real-time computer vision system that detects, tracks, and logs **L-shaped tel
 - [API Endpoints](#api-endpoints)
 - [Database Schema](#database-schema)
 - [How It Works](#how-it-works)
-- [Screenshots](#screenshots)
+- [Results](#results)
 - [Troubleshooting](#troubleshooting)
 - [License](#license)
 
@@ -113,6 +113,11 @@ l_band_detection/
 └── .vscode/
     ├── settings.json       # VS Code Python interpreter config
     └── launch.json         # VS Code debug configuration
+│
+└── docs/
+   ├── database_output.png
+   └──detection_result.png
+
 ```
 
 ---
@@ -341,6 +346,50 @@ The vertical and horizontal bar ratios are configurable in `LSHAPE_CONFIG`.
 Uses `SELECT ... FOR UPDATE` row locking with explicit transactions to prevent race conditions when multiple threads attempt to log the same `track_id` simultaneously.
 
 ---
+
+
+## Results
+
+### Live Detection Output
+
+The application detects the L-Band advertisement from the webcam feed, draws the L-shaped annotation around it, and assigns a persistent tracking ID. The top bar shows live statistics: FPS, camera frame rate, number of active ads, and today's total occurrences.
+
+![Live L-Band Detection](docs/detection_result.png)
+
+| Overlay Element | Meaning |
+|---|---|
+| `L-Band ID:4 (0.68)` | Tracking ID 4, detection confidence 0.68 |
+| `FPS` | Processing speed of the pipeline |
+| `Camera: 30` | Camera feed rate in frames per second |
+| `Active: 1` | Number of ads currently on screen |
+| `Today: 6` | Total appearances logged today |
+
+### Database Output
+
+Each tracked ad is stored in the `lband_ad_events` table. The screenshot below shows the logged records for one day.
+
+![Database Output](docs/database_output.png)
+
+| id | track_id | start_time | end_time | duration_seconds | appearance_count | created_at |
+|---|---|---|---|---|---|---|
+| 1 | 4 | 2026-11-21 22:02:55 | 2026-11-21 22:06:39 | 51.6919 | 2 | 2026-11-21 22:03:06 |
+| 2 | 5 | 2026-11-21 22:03:16 | 2026-11-21 22:03:29 | 12.4697 | 1 | 2026-11-21 22:03:28 |
+| 3 | 8 | 2026-11-21 22:03:44 | 2026-11-21 22:07:13 | 27.2174 | 2 | 2026-11-21 22:03:57 |
+| 4 | 9 | 2026-11-21 22:04:05 | 2026-11-21 22:07:51 | 27.9675 | 2 | 2026-11-21 22:04:19 |
+| 5 | 1 | 2026-11-21 22:05:18 | 2026-11-21 22:05:32 | 13.8992 | 1 | 2026-11-21 22:05:31 |
+| 6 | 3 | 2026-11-21 22:05:42 | 2026-11-21 22:05:54 | 13.9562 | 1 | 2026-11-21 22:05:54 |
+| 7 | 6 | 2026-11-21 22:06:47 | 2026-11-21 22:07:00 | 12.5637 | 1 | 2026-11-21 22:06:59 |
+| 8 | 10 | 2026-11-21 22:07:38 | 2026-11-21 22:07:59 | 20.344 | 1 | 2026-11-21 22:07:58 |
+
+### Summary of This Run
+
+| Metric | Value |
+|---|---|
+| Unique tracks logged | 8 |
+| Total appearances (`appearance_count`) | 11 |
+| Total on-screen time (`duration_seconds`) | ≈ 180.11 seconds |
+| Longest cumulative display | Track 4, 51.69 seconds |
+
 
 ## Troubleshooting
 
